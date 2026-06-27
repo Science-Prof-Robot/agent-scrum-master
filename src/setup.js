@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { spawn } from 'child_process';
+import os from 'os';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -113,6 +115,50 @@ Next steps:
 
 Learn more: https://github.com/keshrath/agent-tasks
 `);
+}
+
+export async function openDashboard(options = {}) {
+  const { projectRoot = process.cwd(), verbose = false } = options;
+
+  const log = (msg) => verbose && console.log(msg);
+  const claudeDir = path.join(projectRoot, '.claude');
+  const settingsPath = path.join(claudeDir, 'settings.json');
+
+  // Check if project is initialized
+  if (!fs.existsSync(settingsPath)) {
+    console.error('\n❌ Project not initialized');
+    console.error('   Run: npx agent-scrum-master init\n');
+    process.exit(1);
+  }
+
+  // Read settings to get port
+  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+  const port = settings.environmentVariables?.AGENT_TASKS_PORT || 3422;
+  const url = `http://localhost:${port}`;
+
+  console.log(`\n🌐 Opening dashboard at ${url}...\n`);
+
+  try {
+    // Open URL in default browser (cross-platform)
+    const platform = os.platform();
+    const openCommand =
+      platform === 'darwin'
+        ? 'open'
+        : platform === 'win32'
+          ? 'start'
+          : 'xdg-open';
+
+    spawn(openCommand, [url], {
+      stdio: 'ignore',
+      detached: true,
+    }).unref();
+
+    log(`✓ Dashboard should open shortly`);
+    console.log(`💡 Make sure agent-tasks is running. Open your project in Claude Code or Cursor.`);
+  } catch (error) {
+    console.error(`\n⚠️  Could not open browser automatically`);
+    console.error(`   Please visit: ${url}\n`);
+  }
 }
 
 function buildSettings(jiraUrl, jiraProject) {

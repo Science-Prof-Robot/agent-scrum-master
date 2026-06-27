@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { setup } from '../src/setup.js';
+import { setup, openDashboard } from '../src/setup.js';
 
 const args = process.argv.slice(2);
 const command = args[0] || 'init';
@@ -23,6 +23,7 @@ Commands:
   init              Initialize agent-tasks (default)
   reset             Remove agent-tasks setup from project
   status            Check if agent-tasks is initialized
+  dashboard         Open the task dashboard in browser
 
 Options:
   --verbose, -v           Show detailed output
@@ -37,6 +38,7 @@ Examples:
   npx agent-scrum-master init --jira-url=https://jira.company.com --jira-project=GROWTH
   npx agent-scrum-master reset
   npx agent-scrum-master status
+  npx agent-scrum-master dashboard
   `);
   process.exit(0);
 }
@@ -48,12 +50,14 @@ try {
     await setup({ ...options, reset: true });
   } else if (command === 'status') {
     await setup({ ...options, statusOnly: true });
+  } else if (command === 'dashboard') {
+    await openDashboard(options);
   } else {
     console.error(`Unknown command: ${command}`);
     process.exit(1);
   }
 } catch (error) {
-  console.error('\n❌ Setup failed:', error.message);
+  console.error('\n❌ Error:', error.message);
   if (options.verbose) {
     console.error(error);
   }
