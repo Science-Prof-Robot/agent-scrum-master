@@ -1,0 +1,38 @@
+{
+  "name": "agent-scrum-master",
+  "version": "1.0.0",
+  "description": "Auto-setup agent-tasks pipeline for any project. One command to initialize agent-driven workflow management.",
+  "main": "src/setup.js",
+  "type": "module",
+  "bin": {
+    "agent-scrum-master": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "agent-tasks",
+    "ai-agents",
+    "task-pipeline",
+    "workflow",
+    "claude-code",
+    "cursor",
+    "mcp",
+    "initialization"
+  ],
+  "author": "Ashish Dogra",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashishdogra/agent-scrum-master.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ashishdogra/agent-scrum-master/issues"
+  },
+  "homepage": "https://github.com/ashishdogra/agent-scrum-master#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
