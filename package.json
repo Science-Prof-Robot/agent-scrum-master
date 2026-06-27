@@ -1,11 +1,11 @@
 {
-  "name": "agent-scrum-master",
+  "name": "agents-scrum-master",
   "version": "1.0.0",
   "description": "Auto-setup agent-tasks pipeline for any project. One command to initialize agent-driven workflow management.",
   "main": "src/setup.js",
   "type": "module",
   "bin": {
-    "agent-scrum-master": "./bin/cli.js"
+    "agents-scrum-master": "./bin/cli.js"
   },
   "scripts": {
     "test": "node --test tests/*.test.js",
