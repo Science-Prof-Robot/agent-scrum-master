@@ -43,16 +43,13 @@ agent-scrum-master
 
 Runs in your project root and:
 
-1. ✓ Creates `.claude/settings.json` with MCP server config
+1. ✓ Creates `.mcp.json` with Claude Code MCP server config
 2. ✓ Creates `.agent-tasks/` directory for local task database
 3. ✓ Adds `.agent-tasks/` to `.gitignore`
-4. ✓ Ready for Claude Code, Cursor, or any MCP client
+4. ✓ Creates `.claude/skills/agents-scrum-master.md` — skill documentation
+5. ✓ Pins agent-tasks@1.10.11 for consistent MCP behavior
 
-**Result:** Open the project in your agent and the task pipeline is live.
-
-Also creates:
-5. ✓ `.claude/skills/agents-scrum-master.md` — skill documentation for agents
-6. ✓ Pins agent-tasks@1.10.11 for consistent MCP behavior
+**Result:** Commit `.mcp.json`, open the project in Claude Code, approve the server once, then agents have full access to task pipeline.
 
 ---
 
@@ -123,15 +120,17 @@ After running `agent-scrum-master`:
 
 ```
 your-project/
+├── .mcp.json                  # MCP server config (commit this!)
 ├── .claude/
-│   └── settings.json          # MCP config (auto-created)
+│   └── skills/
+│       └── agents-scrum-master.md   # Skill for agents
 ├── .agent-tasks/              # Task database (git-ignored)
 │   └── tasks.db
 ├── .gitignore                 # Updated with .agent-tasks/
 └── ... (your code)
 ```
 
-`.claude/settings.json` is **committed to git** — other team members inherit the setup automatically.
+**Commit `.mcp.json` to git** — teammates inherit the setup automatically. On first Claude Code session, approve the MCP server once and it auto-connects thereafter.
 
 ---
 

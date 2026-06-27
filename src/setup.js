@@ -18,20 +18,20 @@ export async function setup(options = {}) {
   } = options;
 
   const log = (msg) => verbose && console.log(msg);
+  const mcpPath = path.join(projectRoot, '.mcp.json');
   const claudeDir = path.join(projectRoot, '.claude');
-  const settingsPath = path.join(claudeDir, 'settings.json');
   const agentTasksDir = path.join(projectRoot, '.agent-tasks');
   const gitignorePath = path.join(projectRoot, '.gitignore');
 
   // Status check
   if (statusOnly) {
-    const hasSettings = fs.existsSync(settingsPath);
+    const hasMcp = fs.existsSync(mcpPath);
     const hasDir = fs.existsSync(agentTasksDir);
     console.log(`\n📊 agent-scrum-master status in ${projectRoot}\n`);
-    console.log(`  .claude/settings.json: ${hasSettings ? '✓' : '✗'}`);
+    console.log(`  .mcp.json:            ${hasMcp ? '✓' : '✗'}`);
     console.log(`  .agent-tasks/:        ${hasDir ? '✓' : '✗'}`);
     console.log(
-      `\n  Status: ${hasSettings && hasDir ? '✅ Initialized' : '⚠️  Not initialized'}\n`
+      `\n  Status: ${hasMcp && hasDir ? '✅ Initialized' : '⚠️  Not initialized'}\n`
     );
     return;
   }
@@ -39,9 +39,9 @@ export async function setup(options = {}) {
   // Reset
   if (reset) {
     log('Removing agent-scrum-master setup...');
-    if (fs.existsSync(settingsPath)) {
-      fs.unlinkSync(settingsPath);
-      console.log('✓ Removed .claude/settings.json');
+    if (fs.existsSync(mcpPath)) {
+      fs.unlinkSync(mcpPath);
+      console.log('✓ Removed .mcp.json');
     }
     if (fs.existsSync(agentTasksDir)) {
       fs.rmSync(agentTasksDir, { recursive: true, force: true });
@@ -60,16 +60,16 @@ export async function setup(options = {}) {
     log('Created .claude/');
   }
 
-  // Create settings.json
-  if (!fs.existsSync(settingsPath) || force) {
-    const settings = buildSettings(jiraUrl, jiraProject);
-    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
-    console.log('✓ Created .claude/settings.json');
-    log(`  → MCP server: agent-tasks`);
+  // Create .mcp.json (Claude Code's MCP config format)
+  if (!fs.existsSync(mcpPath) || force) {
+    const mcpConfig = buildMcpConfig(jiraUrl, jiraProject);
+    fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig, null, 2) + '\n');
+    console.log('✓ Created .mcp.json');
+    log(`  → MCP server: agent-tasks@1.10.11`);
     log(`  → Database: .agent-tasks/tasks.db`);
     if (jiraUrl) log(`  → Jira integration: ${jiraUrl}`);
   } else {
-    console.log('✓ .claude/settings.json already exists');
+    console.log('✓ .mcp.json already exists');
     if (!force) {
       log('  (use --force to overwrite)');
     }
@@ -195,10 +195,11 @@ This project has agent-tasks MCP server configured. Use these tools:
 ✅ agent-scrum-master initialized!
 
 Next steps:
-  1. Commit: git add .claude/ && git commit -m "chore: enable agent-scrum-master"
-  2. Start: Open this project in Claude Code or Cursor
-  3. Dashboard: npx agents-scrum-master dashboard
-  4. Create tasks: Use MCP 'task_create' tool
+  1. Commit: git add .mcp.json .claude/skills/ && git commit -m "chore: enable agent-scrum-master"
+  2. Restart: Open this project in Claude Code (first time shows "Pending approval")
+  3. Approve: Click "Approve" on the agent-tasks MCP server prompt
+  4. Dashboard: npx agents-scrum-master dashboard (after approval)
+  5. Create tasks: Use MCP 'task_create' tool in agents
 
 Skill available to agents: /agents-scrum-master
 Learn more: https://github.com/keshrath/agent-tasks
@@ -209,19 +210,18 @@ export async function openDashboard(options = {}) {
   const { projectRoot = process.cwd(), verbose = false } = options;
 
   const log = (msg) => verbose && console.log(msg);
-  const claudeDir = path.join(projectRoot, '.claude');
-  const settingsPath = path.join(claudeDir, 'settings.json');
+  const mcpPath = path.join(projectRoot, '.mcp.json');
 
   // Check if project is initialized
-  if (!fs.existsSync(settingsPath)) {
+  if (!fs.existsSync(mcpPath)) {
     console.error('\n❌ Project not initialized');
-    console.error('   Run: npx agent-scrum-master init\n');
+    console.error('   Run: npx agents-scrum-master init\n');
     process.exit(1);
   }
 
-  // Read settings to get port
-  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-  const port = settings.environmentVariables?.AGENT_TASKS_PORT || 3422;
+  // Read MCP config to get port
+  const mcpConfig = JSON.parse(fs.readFileSync(mcpPath, 'utf-8'));
+  const port = mcpConfig.mcpServers?.['agent-tasks']?.env?.AGENT_TASKS_PORT || 3422;
   const url = `http://localhost:${port}`;
 
   console.log(`\n🌐 Opening dashboard at ${url}...\n`);
@@ -249,7 +249,7 @@ export async function openDashboard(options = {}) {
   }
 }
 
-function buildSettings(jiraUrl, jiraProject) {
+function buildMcpConfig(jiraUrl, jiraProject) {
   const env = {
     AGENT_TASKS_DB: '.agent-tasks/tasks.db',
     AGENT_TASKS_PORT: '3422',
@@ -265,10 +265,11 @@ function buildSettings(jiraUrl, jiraProject) {
   return {
     mcpServers: {
       'agent-tasks': {
+        type: 'stdio',
         command: 'npx',
         args: ['agent-tasks@1.10.11'],
+        env,
       },
     },
-    environmentVariables: env,
   };
 }
