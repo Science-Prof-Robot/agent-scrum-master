@@ -50,6 +50,18 @@ Runs in your project root and:
 
 **Result:** Open the project in your agent and the task pipeline is live.
 
+Also creates:
+5. ✓ `.claude/skills/agents-scrum-master.md` — skill documentation for agents
+6. ✓ Pins agent-tasks@1.10.11 for consistent MCP behavior
+
+---
+
+## Dependencies
+
+agents-scrum-master pins [agent-tasks@1.10.11](https://github.com/keshrath/agent-tasks) in the MCP config to ensure consistent behavior across sessions. 
+
+To use a different version, edit `.claude/settings.json` and change `args: ['agent-tasks@VERSION']` to your desired version.
+
 ---
 
 ## Commands

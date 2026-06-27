@@ -266,7 +266,7 @@ function buildSettings(jiraUrl, jiraProject) {
     mcpServers: {
       'agent-tasks': {
         command: 'npx',
-        args: ['agent-tasks'],
+        args: ['agent-tasks@1.10.11'],
       },
     },
     environmentVariables: env,
