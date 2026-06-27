@@ -58,6 +58,9 @@ Runs in your project root and:
 # Initialize (default)
 npx agent-scrum-master
 
+# Open dashboard in browser
+npx agent-scrum-master dashboard
+
 # With Jira integration
 npx agent-scrum-master --jira-url=https://jira.company.com --jira-project=GROWTH
 
@@ -80,14 +83,17 @@ npx agent-scrum-master --force
 
 Once initialized, open the project in Claude Code or Cursor:
 
+### View dashboard
+Open in browser with one command:
+```bash
+npx agent-scrum-master dashboard
+```
+
+Or navigate manually to `http://localhost:3422`
+
 ### Create a task
 ```
 Use the MCP tool: task_create(title: "Build login flow", description: "...", project: "MyProject")
-```
-
-### View dashboard
-```
-http://localhost:3422
 ```
 
 ### Advance stages
