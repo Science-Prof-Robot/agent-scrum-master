@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "agent-tasks": {
+      "command": "npx",
+      "args": [
+        "agent-tasks"
+      ]
+    }
+  },
+  "environmentVariables": {
+    "AGENT_TASKS_DB": ".agent-tasks/tasks.db",
+    "AGENT_TASKS_PORT": "3422"
+  }
+}
